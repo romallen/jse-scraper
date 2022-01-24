@@ -5,7 +5,7 @@ import json
 import pymongo
 from dotenv import load_dotenv
 import os
-import numpy as np
+
 
 load_dotenv()
 
@@ -26,10 +26,9 @@ options = ticker_soup.find_all("option")
 for tick in options:
     tickers.append(tick['value'])
     
-   
 
 def scape_data(company):
-    print(company)
+    
     tick_response = requests.get(f'https://www.jamstockex.com/trading/instruments/?instrument={company}')
     company_soup = BeautifulSoup(tick_response.content, "html.parser")
     #get trade data from script tag and strips leading whitespaces
@@ -39,6 +38,10 @@ def scape_data(company):
     ohlc_data = json.loads(pattern.findall(company_data)[5])
     volume_data = json.loads(pattern.findall(company_data)[6])
     ohlcv = []
+    #checks for empty data sets and returns a list with empty values
+    if ohlc_data is None:
+        return [[0,0,0,0,0,0]]
+    #merge ohlc and volume data into one list
     for i in range(len(ohlc_data)):
         price = ohlc_data[i]
         vol = volume_data[i]
@@ -50,21 +53,19 @@ def scape_data(company):
 for comp in tickers:
     ohlcv_data = scape_data(comp)
     comp_tick = comp.split("-")[0].upper()
-    if coll.find({"ticker": comp_tick}).count() ==0:
-        coll.insert({"name": comp_tick, "ticker": comp_tick,"blurb" : "Preference Shares", "ohlcv": [[0,0,0,0,0,0]] })
+    print(comp_tick)
+    #adds entry into MongoDb if it doesn't already exists
+    if coll.find({"ticker": comp_tick}).count() == 0:
+        coll.insert({"name": comp_tick, "ticker": comp_tick,"blurb" : "Preference Shares/bond", "ohlcv": [[0,0,0,0,0,0]] })
     mongo_data = []
     for data in coll.find({"ticker": comp_tick}):
        mongo_data = data["ohlcv"]
     
 
-    mongo_last_idx = len(mongo_data) -1 
-    
+    #updates mongoDB with new data
     for i in range(len(ohlcv_data)):
-        print(i) 
-        print(mongo_data[mongo_last_idx])
-        print(ohlcv_data[-1])
         
-        if ohlcv_data[i][0] > mongo_data[mongo_last_idx][0]:
+        if ohlcv_data[i][0] > mongo_data[-1][0]:
             update = coll.update_one({"ticker": comp_tick}, {"$push":  {"ohlcv":  ohlcv_data[i]}})
             print(update)
             
