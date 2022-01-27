@@ -13,7 +13,7 @@ load_dotenv()
 client = pymongo.MongoClient(os.environ.get("DB_URL"))
 db = client["jse"]
 coll = db["companies"]
-#print(coll.find({"ticker": "138SL"}))
+
 
 #get tickers
 response = requests.get('https://www.jamstockex.com/trading/instruments/?instrument=138sl-jmd')
@@ -25,10 +25,9 @@ options = ticker_soup.find_all("option")
 #append tickers into list
 for tick in options:
     tickers.append(tick['value'])
-    
+    coll.update_one({"name": "meta"}, {"$push":  {"companies":{tick['value'].split("-")[0].upper(): tick.text}}} )    
 
 def scape_data(company):
-    
     tick_response = requests.get(f'https://www.jamstockex.com/trading/instruments/?instrument={company}')
     company_soup = BeautifulSoup(tick_response.content, "html.parser")
     #get trade data from script tag and strips leading whitespaces
@@ -61,7 +60,6 @@ for comp in tickers:
     for data in coll.find({"ticker": comp_tick}):
        mongo_data = data["ohlcv"]
     
-
     #updates mongoDB with new data
     for i in range(len(ohlcv_data)):
         
