@@ -25,7 +25,8 @@ options = ticker_soup.find_all("option")
 #append tickers into list
 for tick in options:
     tickers.append(tick['value'])
-    coll.update_one({"name": "meta"}, {"$push":  {"companies":{tick['value'].split("-")[0].upper(): tick.text}}} )    
+    # adds company to mongodb. It only needs to be run once.
+    # coll.update_one({"name": "meta"}, {"$push":  {"companies":{tick['value'].split("-")[0].upper(): tick.text}}} )    
 
 def scape_data(company):
     tick_response = requests.get(f'https://www.jamstockex.com/trading/instruments/?instrument={company}')
@@ -58,12 +59,12 @@ for comp in tickers:
         coll.insert({"name": comp_tick, "ticker": comp_tick,"blurb" : "Preference Shares/bond", "ohlcv": [[0,0,0,0,0,0]] })
     mongo_data = []
     for data in coll.find({"ticker": comp_tick}):
-       mongo_data = data["ohlcv"]
+       mongo_data = data["ohlcv"][-1][0]
     
     #updates mongoDB with new data
     for i in range(len(ohlcv_data)):
         
-        if ohlcv_data[i][0] > mongo_data[-1][0]:
+        if ohlcv_data[i][0] > mongo_data:
             update = coll.update_one({"ticker": comp_tick}, {"$push":  {"ohlcv":  ohlcv_data[i]}})
             print(update)
             
