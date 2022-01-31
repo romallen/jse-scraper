@@ -21,8 +21,10 @@ I've built a companion react app to display the data in a way that suit my needs
 
 
 ## Installation
-After forking and cloning the repository run `pip3 install -r requirements.txt` to install the necessary modules 
-
+1. Clone this project git clone https://github.com/romallen/jse-scraper.git and cd into it `cd jse-scraper`
+2. Add a Virtual Environment `python3 -m venv .venv` (Optional)
+3. Activate the Virtual Environment source `.venv/bin/activate` (Optional)
+4. Install Requirements `pip3 install -r requirements.txt`
 ## Tests
 TBD
 
@@ -38,4 +40,4 @@ Add a `DB_URL=''` variable to the `.env` file and input the url provided by Mong
 
 
 ## License
-MIT © [Romaine Allen]()
+MIT
