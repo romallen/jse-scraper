@@ -1,4 +1,4 @@
-### Jamaica Stock Exchange Web Scraper
+## Jamaica Stock Exchange Web Scraper
 This is a script to scrape stock price data from the Jamaica Stock Exchange website.
 
 ## Motivation
