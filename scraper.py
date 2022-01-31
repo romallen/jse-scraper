@@ -56,7 +56,7 @@ for comp in tickers:
     print(comp_tick)
     #adds entry into MongoDb if it doesn't already exists
     if coll.find({"ticker": comp_tick}).count() == 0:
-        coll.insert({"name": comp_tick, "ticker": comp_tick,"blurb" : "Preference Shares/bond", "ohlcv": [[0,0,0,0,0,0]] })
+        coll.insert_one({"name": comp_tick, "ticker": comp_tick,"blurb" : "Preference Shares/bond", "ohlcv": [[0,0,0,0,0,0]] })
     mongo_data = []
     for data in coll.find({"ticker": comp_tick}):
        mongo_data = data["ohlcv"][-1][0]
