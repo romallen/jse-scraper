@@ -1,5 +1,5 @@
 ## Jamaica Stock Exchange Web Scraper
-This is a script to scrape stock price data from the Jamaica Stock Exchange website.
+This is a script to scrape stock & bond price data from the Jamaica Stock Exchange website.
 
 ## Motivation
 I created this script because I found it difficult and time consuming to navigate the JSE website and find the information that I was looking for. I also wanted to use technical analysis tools on the data and the JSE website did not offer this feature.
@@ -15,9 +15,9 @@ I created this script because I found it difficult and time consuming to navigat
 - [MongoDB](https://www.mongodb.com)
 
 ## Features
-This script extracts all the relevant data on equities and bonds traded on the JSE. It thens transform the data into a JSON object and loads it into AWS Dynamo DB and/or MongoDB. From there it can be retrieved and used as the user sees fit. 
+This script extracts all the relevant data on equities and bonds traded on the JSE. It then transforms the data into a JSON object and loads it into AWS Dynamo DB and/or MongoDB. From there it can be retrieved and used as the user sees fit. 
 
-I've built a companion react app to display the data in a way that suit my needs. You can find that app [here](https://github.com/romallen/chart-app).
+I've built a companion react app to display the data in a way that suited my needs. You can find that app [here](https://github.com/romallen/jse-chart-react).
 
 
 ## Installation
@@ -32,7 +32,11 @@ TBD
 #Setup
 Create a `.env` file in the root of the project.
 <b>MongoDB</b> 
-Add a `DB_URL=''` variable to the `.env` file and input the url provided by MongoDB.
+Add a `DB_URL=''` variable to the `.env` file and input your database url provided by MongoDB.
+*You can learn how to setup a MongoDB database [here](https://www.mongodb.com/basics/create-database)*
+
+
+
 
 <b>#AWS</b>
 
