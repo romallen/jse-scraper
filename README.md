@@ -32,10 +32,9 @@ TBD
 #Setup
 Create a `.env` file in the root of the project.
 <b>MongoDB</b> 
-Add a `DB_URL=''` variable to the `.env` file and input your database url provided by MongoDB.
+Add  `DB_URL=''` , `DB_NAME=''` & `COLL_NAME = ''` variables to the `.env` file and input values provided by MongoDB.
+
 *You can learn how to setup a MongoDB database [here](https://www.mongodb.com/basics/create-database)*
-
-
 
 
 <b>#AWS</b>
