@@ -19,23 +19,30 @@ I've built a companion react app to display the data in a way that suited my nee
 
 
 ## Installation
-1. Clone this project `git clone https://github.com/romallen/jse-scraper.git` and cd into it `cd jse-scraper`
-2. Add a Virtual Environment `python3 -m venv .venv` (Optional)
-3. Activate the Virtual Environment `source .venv/bin/activate` (Optional)
-4. Install Requirements `pip3 install -r requirements.txt`
+1. Clone this project and cd into it  
+   `git clone https://github.com/romallen/jse-scraper.git`  
+   `cd jse-scraper`
+2. Add a Virtual Environment (Optional)  
+  `python3 -m venv .venv` 
+3. Activate the Virtual Environment (Optional)  
+  `source .venv/bin/activate`
+4. Install Requirements  
+  `pip3 install -r requirements.txt`
+  
 ## Tests
 TBD
 
 ## How to use?
-#Setup
-Create a `.env` file in the root of the project.
-<b>MongoDB</b> 
-Add  `DB_URL=''` , `DB_NAME=''` & `COLL_NAME = ''` variables to the `.env` file and input values provided by MongoDB.
+### Setup
+Create a `.env` file in the root of the project.  
+
+### MongoDB  
+Add  `DB_URL=''` , `DB_NAME=''` & `COLL_NAME = ''` variables to the `.env` file and input values provided by MongoDB.  
 
 *You can learn how to setup a MongoDB database [here](https://www.mongodb.com/basics/create-database)*
 
 
-<b>#AWS</b>
+### AWS 
 
 
 
