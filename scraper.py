@@ -3,12 +3,14 @@ from bs4 import BeautifulSoup
 import re
 import json
 import pymongo
+import boto3
+import botocore
 from dotenv import load_dotenv
 import os
 
 
 load_dotenv()
-
+s3 = boto3.resource('s3')
 # sets up MongoDb connection
 client = pymongo.MongoClient(os.environ.get("DB_URL"))
 db = client[os.environ.get("DB_NAME")]
@@ -61,14 +63,18 @@ for comp in tickers:
         coll.insert_one({"name": comp_tick, "ticker": comp_tick,"blurb" : "Preference Shares/bond", "ohlcv": [[0,0,0,0,0,0]] })
     mongo_data = []
     for data in coll.find({"ticker": comp_tick}):
-       mongo_data = data["ohlcv"][-1][0]
+        mongo_data = data["ohlcv"][-1][0]
+        ticker = data["ticker"]
     
-    #updates mongoDB with new data
-    for i in range(len(ohlcv_data)):
-        
+    
+    # #updates mongoDB with new data
+    for i in range(len(ohlcv_data)):    
         if ohlcv_data[i][0] > mongo_data:
             update = coll.update_one({"ticker": comp_tick}, {"$push":  {"ohlcv":  ohlcv_data[i]}})
             print(update)
             
         
-            
+    for data in coll.find({"ticker": comp_tick}):
+       
+        s3object = s3.Object(os.environ.get("S3_BUCKET"), f'jsonv2/{ticker}.json')
+        s3object.put( Body=(bytes(json.dumps(data["ohlcv"]).encode('UTF-8'))), ContentType='application/json' )
