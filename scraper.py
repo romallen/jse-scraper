@@ -22,12 +22,13 @@ ticker_soup = BeautifulSoup(response.content, "html.parser")
 tickers = []
 options = ticker_soup.find_all("option")
 
+coll.delete_many({"name": "meta"})
+coll.insert_one({"name": "meta", "companies":[]})
 #append tickers into list
 for tick in options:
     tickers.append(tick['value'])
     # adds company list to mongodb.
-    #coll.delete_one({"name": "meta"})
-    #coll.insert_one({"name": "meta"}, {"$push":  {"companies":{tick['value'].split("-")[0].upper(): tick.text}}} )    
+    coll.update_one({"name": "meta"}, {"$push":  {"companies":{tick['value'].split("-")[0].upper(): tick.text}}} )    
 
 def scape_data(company):
     tick_response = requests.get(f'https://www.jamstockex.com/trading/instruments/?instrument={company}')
@@ -56,7 +57,7 @@ for comp in tickers:
     comp_tick = comp.split("-")[0].upper()
     print(comp_tick)
     #adds entry into MongoDb if it doesn't already exists
-    if coll.find({"ticker": comp_tick}).count() == 0:
+    if coll.count_documents({"ticker": comp_tick}) == 0:
         coll.insert_one({"name": comp_tick, "ticker": comp_tick,"blurb" : "Preference Shares/bond", "ohlcv": [[0,0,0,0,0,0]] })
     mongo_data = []
     for data in coll.find({"ticker": comp_tick}):
