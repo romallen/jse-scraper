@@ -11,8 +11,8 @@ load_dotenv()
 
 # sets up MongoDb connection
 client = pymongo.MongoClient(os.environ.get("DB_URL"))
-db = client["jse"]
-coll = db["companies"]
+db = client[os.environ.get("DB_NAME")]
+coll = db[os.environ.get("COLL_NAME")]
 
 
 #get tickers
@@ -25,8 +25,9 @@ options = ticker_soup.find_all("option")
 #append tickers into list
 for tick in options:
     tickers.append(tick['value'])
-    # adds company to mongodb. It only needs to be run once.
-    # coll.update_one({"name": "meta"}, {"$push":  {"companies":{tick['value'].split("-")[0].upper(): tick.text}}} )    
+    # adds company list to mongodb.
+    #coll.delete_one({"name": "meta"})
+    #coll.insert_one({"name": "meta"}, {"$push":  {"companies":{tick['value'].split("-")[0].upper(): tick.text}}} )    
 
 def scape_data(company):
     tick_response = requests.get(f'https://www.jamstockex.com/trading/instruments/?instrument={company}')
