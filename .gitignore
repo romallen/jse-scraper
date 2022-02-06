@@ -128,3 +128,7 @@ dmypy.json
 # Pyre type checker
 .pyre/
 scraperAWS.py
+app1.py
+app2.py
+app3.py
+app4.py
