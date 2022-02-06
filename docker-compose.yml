@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  jsescraper:
+    image: jsescraper
+    build:
+      context: .
+      dockerfile: ./Dockerfile
