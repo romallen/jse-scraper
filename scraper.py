@@ -7,11 +7,11 @@ import boto3
 import botocore
 from dotenv import load_dotenv
 import os
-
+import time
 
 load_dotenv()
 s3 = boto3.resource('s3')
-# sets up MongoDb connection
+# sets up MongoDb connection & S3
 client = pymongo.MongoClient(os.environ.get("DB_URL"))
 db = client[os.environ.get("DB_NAME")]
 coll = db[os.environ.get("COLL_NAME")]
@@ -23,9 +23,13 @@ ticker_soup = BeautifulSoup(response.content, "html.parser")
 
 tickers = []
 options = ticker_soup.find_all("option")
+last_updated = 0
 
-coll.delete_many({"name": "meta"})
-coll.insert_one({"name": "meta", "companies":[]})
+for k,v in coll.find_one({"name": "meta"},{"_id":0, "last_updated": 1}).items():
+    last_updated = int(v)
+
+coll.update_many({"name": "meta"}, {"$unset": {"companies": ""}})
+
 #append tickers into list
 for tick in options:
     tickers.append(tick['value'])
@@ -46,10 +50,8 @@ def scape_data(company):
     if ohlc_data is None:
         return [[0,0,0,0,0,0]]
     #merge ohlc and volume data into one list
-    for i in range(len(ohlc_data)):
-        price = ohlc_data[i]
-        vol = volume_data[i]
-        price.append(vol[1])
+    for price, volume in zip(ohlc_data, volume_data):
+        price.append(volume[1])
         ohlcv.append(price)
     return ohlcv
 
@@ -58,23 +60,15 @@ for comp in tickers:
     ohlcv_data = scape_data(comp)
     comp_tick = comp.split("-")[0].upper()
     print(comp_tick)
-    #adds entry into MongoDb if it doesn't already exists
-    if coll.count_documents({"ticker": comp_tick}) == 0:
-        coll.insert_one({"name": comp_tick, "ticker": comp_tick,"blurb" : "Preference Shares/bond", "ohlcv": [[0,0,0,0,0,0]] })
-    mongo_data = []
-    for data in coll.find({"ticker": comp_tick}):
-        mongo_data = data["ohlcv"][-1][0]
-        ticker = data["ticker"]
-    
     
     # #updates mongoDB with new data
-    for i in range(len(ohlcv_data)):    
-        if ohlcv_data[i][0] > mongo_data:
-            update = coll.update_one({"ticker": comp_tick}, {"$push":  {"ohlcv":  ohlcv_data[i]}})
+    for ohlcv in ohlcv_data:
+        if ohlcv[0] > last_updated:
+            update = coll.update_one({"ticker": comp_tick}, {"$push":  {"ohlcv":  ohlcv}})
             print(update)
-            
-        
+
     for data in coll.find({"ticker": comp_tick}):
-       
-        s3object = s3.Object(os.environ.get("S3_BUCKET"), f'jsonv2/{ticker}.json')
-        s3object.put( Body=(bytes(json.dumps(data["ohlcv"]).encode('UTF-8'))), ContentType='application/json' )
+        s3object = s3.Object(os.environ.get("S3_BUCKET"), f'jsonv2/{comp_tick}.json')
+        s3object.put( Body=(bytes(json.dumps(data["ohlcv"]).encode('UTF-8'))), ContentType='application/json')
+
+coll.update_one({"name": "meta"}, {"$set": {"Last_update": int(time.time())*1000}})
