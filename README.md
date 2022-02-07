@@ -1,5 +1,5 @@
 # Jamaica Stock Exchange Web Scraper
-This is a script to scrape stock & bond price data from the Jamaica Stock Exchange website.
+This is a script to scrape stock & bond price data from the [Jamaica Stock Exchange website](https://www.jamstockex.com/).
 
 ## Motivation
 I created this script because I found it difficult and time consuming to navigate the JSE website and find the information that I was looking for. I also wanted to use technical analysis tools on the data and the JSE website did not offer this feature.
