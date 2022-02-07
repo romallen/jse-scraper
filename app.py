@@ -76,7 +76,7 @@ def scrape(event, context):
             s3object = s3.Object(os.environ.get("S3_BUCKET"), f'jsonv2/{comp_tick}.json')
             s3object.put( Body=(bytes(json.dumps(data["ohlcv"]).encode('UTF-8'))), ContentType='application/json')
 
-    coll.update_one({"name": "meta"}, {"$set": {"last_update": int(time.time())*1000}})
+    coll.update_one({"name": "meta"}, {"$set": {"last_updated": int(time.time())*1000}})
     
 
 # scrape("event", "context")
