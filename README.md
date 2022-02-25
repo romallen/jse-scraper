@@ -29,8 +29,6 @@ I've built a companion react app to display the data in a way that suited my nee
 4. Install Requirements  
   `pip3 install -r requirements.txt`
   
-## Tests
-TBD
 
 ## How to use?  
 Create a `.env` file in the root of the project.  
