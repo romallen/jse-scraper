@@ -38,18 +38,26 @@ def store_data(data, comp_tick):
  
             
 def parse(page,comp_tick):
-    soup=BeautifulSoup(page,'html.parser')
+    
+    try:
+        soup=BeautifulSoup(page,'html.parser')
+    except Exception as e:
+        print("Issue for " +comp_tick + " is: " + str(e))
+        
     company_data = soup.findAll('script')[15].text.strip()
     pattern = re.compile(r'data:(.*?),$', re.MULTILINE | re.DOTALL)
     #transform data into json objects
     ohlc_data = json.loads(pattern.findall(company_data)[5])
     volume_data = json.loads(pattern.findall(company_data)[6])
     ohlcv = []
-
+    
     #merge ohlc and volume data into one list
-    for price, volume in zip(ohlc_data, volume_data):
-        price.append(volume[1])
-        ohlcv.append(price)
+    try:
+      for price, volume in zip(ohlc_data, volume_data):
+            price.append(volume[1])
+            ohlcv.append(price)
+    except Exception as e:
+        print("Issue for " +comp_tick + " is: " + str(e))
     store_data(ohlcv, comp_tick)
 
     
@@ -58,10 +66,10 @@ def get_data(company):
     print(company)
     try:
         response = requests.get(f'https://www.jamstockex.com/trading/instruments/?instrument={company}')
-        parse(response.text, comp_tick)
     except Exception as e:
-        print("Issue is: " + str(e))
+        print("Issue for " +company + " is: " + str(e))
 
+    parse(response.text, comp_tick)
 
             
 def scrape(event, context):
@@ -69,4 +77,4 @@ def scrape(event, context):
         executor.map(get_data, tickers)
     coll.update_one({"name": "meta"}, {"$set": {"last_updated": int(time.time())*1000}})  
  
-scrape(None, None)
+scrape("", "")
